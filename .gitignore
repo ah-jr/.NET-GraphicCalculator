@@ -1,4 +1,4 @@
-\.vs
-\GraphicCalculator\bin
-\GraphicCalculator\obj
+.vs/
+GraphicCalculator/bin/
+GraphicCalculator/obj/
 

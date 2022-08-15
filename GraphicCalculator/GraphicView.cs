@@ -26,10 +26,14 @@ namespace GraphicCalculator
         int y_offset = 0;
         int x_clicked = 0;
         int y_clicked = 0;
+        MathManager math_manager;
 
         public GraphicView()
         {
             InitializeComponent();
+
+            math_manager = new MathManager();
+            math_manager.ParseExpression("");
 
             this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -50,7 +54,7 @@ namespace GraphicCalculator
 
             for (int x = -offset - x_offset; x < offset - x_offset; x++)
             {
-                double y = Math.Pow(x / x_scale, 3) * y_scale;
+                double y = math_manager.ApplyExpression(x / x_scale) * y_scale;
                 float x_screen = Width / 2 + (float)(x + x_offset);
                 float y_screen = Height / 2 - (float)(y - y_offset);
 
