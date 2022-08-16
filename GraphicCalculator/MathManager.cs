@@ -8,11 +8,46 @@ namespace GraphicCalculator
 {
     class ot
     {
-        public const int POW = 0;
-        public const int ADD = 1;
-        public const int SUB = 2;
-        public const int MUL = 3;
-        public const int DIV = 4;
+        public const int ADD = 0;
+        public const int SUB = 1;
+        public const int MUL = 2;
+        public const int DIV = 3;
+        public const int POW = 4;
+
+        public const int PAR_L = 100;
+        public const int PAR_R = 101;
+
+        public const int UNDEF = -1;
+
+        public static int HigherPrecedence(int ot1, int ot2)
+        {
+            if (GetPrecedence(ot1) >= GetPrecedence(ot2)) 
+                return ot1;
+
+            return ot2;
+        }
+
+        private static int GetPrecedence(int ot)
+        {
+            switch (ot)
+            {
+                case SUB:
+                case ADD:
+                    return 0;
+                case MUL:
+                case DIV:
+                    return 1;
+                case POW:
+                    return 2;
+                case PAR_L:
+                case PAR_R:
+                    return int.MinValue;
+                case UNDEF:
+                    return int.MaxValue;
+            }
+
+            return -1;
+        }
     }
 
     class ep
@@ -54,76 +89,93 @@ namespace GraphicCalculator
 
         public void ParseExpression(String exp)
         {
-            Expression aux = new Expression(0);
-            Expression op = new Expression(0);
+            Stack<int> operations = new Stack<int>();
+            List<Expression> expressions = new List<Expression>();
 
-            int exp_type = -1;
-            int state = 0;
             int i = 0;
+            int first;
+            int operation;
+            char curr;
 
-            while(i<exp.Length)
+            try
             {
-                char c = exp[i];
-
-                switch(c)
+                // Shunting Yard algorithm
+                while (i < exp.Length)
                 {
-                    case 'x': aux = new Expression(); break;
-                    case '^': exp_type = ot.POW; break;
-                    case '+': exp_type = ot.ADD; break;
-                    case '-': exp_type = ot.SUB; break;
-                    case '*': exp_type = ot.MUL; break;
-                    case '/': exp_type = ot.DIV; break;
+                    curr = exp[i];
+                    operation = ot.UNDEF;
 
-                    default:
-                        if (Char.IsDigit(c))
-                        {
-                            String number = "";
-                            number = String.Concat(number, c.ToString());
-                            int aux_i = 1;
+                    switch (curr)
+                    {
+                        case '^': operation = ot.POW; break;
+                        case '+': operation = ot.ADD; break;
+                        case '-': operation = ot.SUB; break;
+                        case '*': operation = ot.MUL; break;
+                        case '/': operation = ot.DIV; break;
+                        case '(': operation = ot.PAR_L; break;
+                        case ')': operation = ot.PAR_R; break;
 
-                            while((i + aux_i < exp.Length) && (Char.IsDigit(exp[i + aux_i]) || exp[i + aux_i] == '.'))
+                        case 'x': expressions.Add(new Expression()); break;
+
+                        default:
+                            if (Char.IsDigit(curr))
                             {
-                                number = String.Concat(number, exp[i + aux_i].ToString());
-                                aux_i++;
+                                String number = "";
+                                while ((i < exp.Length) && (Char.IsDigit(exp[i]) || exp[i] == '.'))
+                                    number = String.Concat(number, exp[i++].ToString());
+
+                                i--;
+                                expressions.Add(new Expression(float.Parse(number)));
                             }
+                            break;
+                    }
 
-                            i += aux_i - 1;
+                    if (operations.Count > 0 && operation != ot.UNDEF) 
+                    {
+                        if (operation == ot.PAR_R)
+                        {
+                            operation = ot.UNDEF;
+                            while (operations.Count > 0 && operations.Peek() != ot.PAR_L)
+                                MergeLastTwoExpressions(expressions, operations.Pop());
 
-                            aux = new Expression(float.Parse(number));
+                            if (operations.Count > 0 && operations.Peek() == ot.PAR_L)
+                                operations.Pop();
                         }
-                        break;
+                        else if (operation != ot.PAR_L)
+                        {
+                            first = operations.Peek();
+                            if (ot.HigherPrecedence(first, operation) == first)
+                                MergeLastTwoExpressions(expressions, operations.Pop());
+                        }
+                    }
+
+                    if (operation != ot.UNDEF)
+                        operations.Push(operation);
+
+                    i++;
                 }
 
-                switch(state)
-                {
-                    case 0: op = aux; break;
-                    case 2: op = new Expression(exp_type, op, aux); break;
-                    default: break;
-                }
+                while (operations.Count > 0)
+                    MergeLastTwoExpressions(expressions, operations.Pop());
 
-                state++;
-                if (state > 2)
-                    state = 1;
-
-                i++;
+                main_exp = expressions[0];
             }
+            catch (Exception e)
+            {
+                main_exp = new Expression(0);
+            }
+        }
 
-            main_exp = op;
+        private void MergeLastTwoExpressions(List<Expression> expressions, int op)
+        {
+            if (expressions.Count < 2)
+                return;
 
-/*            x^2 + (x^3)/3 
-
-            Expression exp1 = new Expression();
-            Expression exp2 = new Expression(2);
-            Expression exp3 = new Expression();
-            Expression exp4 = new Expression(3);
-            Expression exp5 = new Expression(3);
-
-            Expression exp6 = new Expression(ot.POW, exp1, exp2);
-            Expression exp7 = new Expression(ot.POW, exp3, exp4);
-            Expression exp8 = new Expression(ot.DIV, exp7, exp5);
-            Expression exp9 = new Expression(ot.ADD, exp6, exp8);
-
-            main_exp = exp9;*/
+            Expression exp1 = expressions[expressions.Count - 2];
+            Expression exp2 = expressions[expressions.Count - 1];
+            expressions.RemoveAt(expressions.Count - 1);
+            expressions.RemoveAt(expressions.Count - 1);
+            expressions.Add(new Expression(op, exp1, exp2));
         }
 
         public double EvaluateExpression(double var_value, Expression exp)
@@ -134,34 +186,18 @@ namespace GraphicCalculator
             if (exp.ExpType == ep.VAR)
                 return var_value;
 
-            double res = 0;
             double op1 = EvaluateExpression(var_value, exp.Op1);
             double op2 = EvaluateExpression(var_value, exp.Op2);
 
             switch (exp.OpType)
             {
-                case ot.POW:
-                    res = Math.Pow(op1, op2);
-                    break;
-
-                case ot.ADD:
-                    res = op1 + op2;
-                    break;
-
-                case ot.MUL:
-                    res = op1 * op2;
-                    break;
-
-                case ot.SUB:
-                    res = op1 - op2;
-                    break;
-
-                case ot.DIV:
-                    res = op1 / op2;
-                    break;
+                case ot.POW: return Math.Pow(op1, op2); 
+                case ot.ADD: return op1 + op2;
+                case ot.MUL: return op1 * op2;
+                case ot.SUB: return op1 - op2; 
+                case ot.DIV: return op1 / op2;
+                default: return 0;
             }
-
-            return res;
         }
 
         public double Evaluate(double var_value)

@@ -34,13 +34,13 @@ namespace GraphicCalculator
             this.txtOp1 = new System.Windows.Forms.TextBox();
             this.txtOp2 = new System.Windows.Forms.TextBox();
             this.pnlButtons = new System.Windows.Forms.Panel();
+            this.txtExp = new System.Windows.Forms.TextBox();
             this.txtMaxY = new System.Windows.Forms.TextBox();
             this.txtMinY = new System.Windows.Forms.TextBox();
             this.txtMaxX = new System.Windows.Forms.TextBox();
             this.txtMinX = new System.Windows.Forms.TextBox();
             this.pnlGraphic = new System.Windows.Forms.Panel();
             this.gvGraphic = new GraphicCalculator.GraphicView();
-            this.txtExp = new System.Windows.Forms.TextBox();
             this.pnlButtons.SuspendLayout();
             this.pnlGraphic.SuspendLayout();
             this.SuspendLayout();
@@ -97,6 +97,14 @@ namespace GraphicCalculator
             this.pnlButtons.Size = new System.Drawing.Size(576, 134);
             this.pnlButtons.TabIndex = 5;
             // 
+            // txtExp
+            // 
+            this.txtExp.Location = new System.Drawing.Point(359, 16);
+            this.txtExp.Name = "txtExp";
+            this.txtExp.Size = new System.Drawing.Size(196, 20);
+            this.txtExp.TabIndex = 9;
+            this.txtExp.TextChanged += new System.EventHandler(this.txtExp_TextChanged);
+            // 
             // txtMaxY
             // 
             this.txtMaxY.Location = new System.Drawing.Point(3, 100);
@@ -145,14 +153,6 @@ namespace GraphicCalculator
             this.gvGraphic.Size = new System.Drawing.Size(570, 570);
             this.gvGraphic.TabIndex = 0;
             this.gvGraphic.Text = "graphicView1";
-            // 
-            // txtExp
-            // 
-            this.txtExp.Location = new System.Drawing.Point(426, 16);
-            this.txtExp.Name = "txtExp";
-            this.txtExp.Size = new System.Drawing.Size(93, 20);
-            this.txtExp.TabIndex = 9;
-            this.txtExp.TextChanged += new System.EventHandler(this.txtExp_TextChanged);
             // 
             // CalculatorForm
             // 
