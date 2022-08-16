@@ -35,10 +35,16 @@ namespace GraphicCalculator
             math_manager = new MathManager();
             math_manager.ParseExpression("");
 
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            this.SetStyle(ControlStyles.UserPaint, true);
-            this.SetStyle(ControlStyles.ResizeRedraw, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.ResizeRedraw, true);
+        }
+
+        public void SetExpression(String exp)
+        {
+            math_manager.ParseExpression(exp);
+            Invalidate();
         }
 
         private void PaintBack(Graphics graphics)

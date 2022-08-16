@@ -20,12 +20,17 @@ namespace GraphicCalculator
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            //s
+            //
         }
 
         private void FilterText(object sender, KeyPressEventArgs e)
         {
             e.Handled = !char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar);
+        }
+
+        private void txtExp_TextChanged(object sender, EventArgs e)
+        {
+            gvGraphic.SetExpression(txtExp.Text);
         }
     }
 }

@@ -39,7 +39,8 @@ namespace GraphicCalculator
             this.txtMaxX = new System.Windows.Forms.TextBox();
             this.txtMinX = new System.Windows.Forms.TextBox();
             this.pnlGraphic = new System.Windows.Forms.Panel();
-            this.graphicView1 = new GraphicCalculator.GraphicView();
+            this.gvGraphic = new GraphicCalculator.GraphicView();
+            this.txtExp = new System.Windows.Forms.TextBox();
             this.pnlButtons.SuspendLayout();
             this.pnlGraphic.SuspendLayout();
             this.SuspendLayout();
@@ -82,6 +83,7 @@ namespace GraphicCalculator
             // pnlButtons
             // 
             this.pnlButtons.BackColor = System.Drawing.SystemColors.Control;
+            this.pnlButtons.Controls.Add(this.txtExp);
             this.pnlButtons.Controls.Add(this.txtMaxY);
             this.pnlButtons.Controls.Add(this.txtMinY);
             this.pnlButtons.Controls.Add(this.txtMaxX);
@@ -130,19 +132,27 @@ namespace GraphicCalculator
             // pnlGraphic
             // 
             this.pnlGraphic.BackColor = System.Drawing.SystemColors.Control;
-            this.pnlGraphic.Controls.Add(this.graphicView1);
+            this.pnlGraphic.Controls.Add(this.gvGraphic);
             this.pnlGraphic.Location = new System.Drawing.Point(12, 13);
             this.pnlGraphic.Name = "pnlGraphic";
             this.pnlGraphic.Size = new System.Drawing.Size(576, 576);
             this.pnlGraphic.TabIndex = 6;
             // 
-            // graphicView1
+            // gvGraphic
             // 
-            this.graphicView1.Location = new System.Drawing.Point(3, 3);
-            this.graphicView1.Name = "graphicView1";
-            this.graphicView1.Size = new System.Drawing.Size(570, 570);
-            this.graphicView1.TabIndex = 0;
-            this.graphicView1.Text = "graphicView1";
+            this.gvGraphic.Location = new System.Drawing.Point(3, 3);
+            this.gvGraphic.Name = "gvGraphic";
+            this.gvGraphic.Size = new System.Drawing.Size(570, 570);
+            this.gvGraphic.TabIndex = 0;
+            this.gvGraphic.Text = "graphicView1";
+            // 
+            // txtExp
+            // 
+            this.txtExp.Location = new System.Drawing.Point(426, 16);
+            this.txtExp.Name = "txtExp";
+            this.txtExp.Size = new System.Drawing.Size(93, 20);
+            this.txtExp.TabIndex = 9;
+            this.txtExp.TextChanged += new System.EventHandler(this.txtExp_TextChanged);
             // 
             // CalculatorForm
             // 
@@ -174,7 +184,8 @@ namespace GraphicCalculator
         private System.Windows.Forms.TextBox txtMinY;
         private System.Windows.Forms.TextBox txtMaxX;
         private System.Windows.Forms.TextBox txtMinX;
-        private GraphicView graphicView1;
+        private GraphicView gvGraphic;
+        private System.Windows.Forms.TextBox txtExp;
     }
 }
 
