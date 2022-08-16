@@ -54,7 +54,7 @@ namespace GraphicCalculator
 
             for (int x = -offset - x_offset; x < offset - x_offset; x++)
             {
-                double y = math_manager.ApplyExpression(x / x_scale) * y_scale;
+                double y = math_manager.Evaluate(x / x_scale) * y_scale;
                 float x_screen = Width / 2 + (float)(x + x_offset);
                 float y_screen = Height / 2 - (float)(y - y_offset);
 
