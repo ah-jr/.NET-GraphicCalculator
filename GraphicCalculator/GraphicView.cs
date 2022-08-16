@@ -20,6 +20,7 @@ namespace GraphicCalculator
     public partial class GraphicView : Control
     {
         bool graph_clicked = false;
+        bool paint_line = false;
         float x_scale = 50;
         float y_scale = 50;
         int x_offset = 0;
@@ -33,7 +34,6 @@ namespace GraphicCalculator
             InitializeComponent();
 
             math_manager = new MathManager();
-            math_manager.ParseExpression("");
 
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -41,10 +41,11 @@ namespace GraphicCalculator
             SetStyle(ControlStyles.ResizeRedraw, true);
         }
 
-        public void SetExpression(String exp)
+        public bool SetExpression(String exp)
         {
-            math_manager.ParseExpression(exp);
+            paint_line = math_manager.ParseExpression(exp);
             Invalidate();
+            return paint_line;
         }
 
         private void PaintBack(Graphics graphics)
@@ -61,10 +62,15 @@ namespace GraphicCalculator
             for (int x = -offset - x_offset; x < offset - x_offset; x++)
             {
                 double y = math_manager.Evaluate(x / x_scale) * y_scale;
+
+                // In case some values are NaN:
+                if (Double.IsNaN(y))
+                    y = 0;
+
                 float x_screen = Width / 2 + (float)(x + x_offset);
                 float y_screen = Height / 2 - (float)(y - y_offset);
 
-                // Prevent overflow on painting lines:
+                // Clip extremities: 
                 y_screen = Math.Min(Height + 2, Math.Max(y_screen, -2));
 
                 graphic_points[x + offset + x_offset] = new PointF(x_screen, y_screen);
@@ -133,7 +139,9 @@ namespace GraphicCalculator
             base.OnPaint(e);
             PaintBack(e.Graphics);
             PaintGrid(e.Graphics);
-            PaintGraphics(e.Graphics);
+
+            if(paint_line)
+                PaintGraphics(e.Graphics);
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)

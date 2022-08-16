@@ -14,8 +14,11 @@ namespace GraphicCalculator
         public const int DIV = 3;
         public const int POW = 4;
 
-        public const int PAR_L = 100;
-        public const int PAR_R = 101;
+        public const int SIN = 100;
+        public const int COS = 101;
+
+        public const int PAR_L = 200;
+        public const int PAR_R = 201;
 
         public const int UNDEF = -1;
 
@@ -55,6 +58,7 @@ namespace GraphicCalculator
         public const int EXP = 0;
         public const int VAL = 1;
         public const int VAR = 2;
+        public const int FUN = 3;
     }
 
     class Expression
@@ -72,11 +76,20 @@ namespace GraphicCalculator
             Op1 = op1;
             Op2 = op2;
         }
+
+        public Expression(int op_type, Expression exp)
+        {
+            ExpType = ep.FUN;
+            OpType = op_type;
+            Op1 = exp;
+        }
+
         public Expression(double value)
         {
             ExpType = ep.VAL;
             Val = value;
         }
+
         public Expression()
         {
             ExpType = ep.VAR;
@@ -87,10 +100,11 @@ namespace GraphicCalculator
     {
         private Expression main_exp;
 
-        public void ParseExpression(String exp)
+        public bool ParseExpression(String exp)
         {
             Stack<int> operations = new Stack<int>();
             List<Expression> expressions = new List<Expression>();
+            main_exp = new Expression(0);
 
             int i = 0;
             int first;
@@ -116,6 +130,10 @@ namespace GraphicCalculator
                         case ')': operation = ot.PAR_R; break;
 
                         case 'x': expressions.Add(new Expression()); break;
+                        case 's':
+                            if (exp.Length > i + 2 && exp[i+1] == 'i' && exp[i+2] == 'n')
+                                expressions.Add(new Expression(ot.SIN, new Expression()));
+                            break;
 
                         default:
                             if (Char.IsDigit(curr))
@@ -156,26 +174,32 @@ namespace GraphicCalculator
                 }
 
                 while (operations.Count > 0)
-                    MergeLastTwoExpressions(expressions, operations.Pop());
+                    if (!MergeLastTwoExpressions(expressions, operations.Pop()))
+                        return false;
 
-                main_exp = expressions[0];
+                if (expressions.Count > 1)                    
+                    return false;
+
+                 main_exp = expressions[0];
+                 return true;
             }
             catch (Exception e)
             {
-                main_exp = new Expression(0);
+                return false;
             }
         }
 
-        private void MergeLastTwoExpressions(List<Expression> expressions, int op)
+        private bool MergeLastTwoExpressions(List<Expression> expressions, int op)
         {
             if (expressions.Count < 2)
-                return;
+                return false;
 
             Expression exp1 = expressions[expressions.Count - 2];
             Expression exp2 = expressions[expressions.Count - 1];
             expressions.RemoveAt(expressions.Count - 1);
             expressions.RemoveAt(expressions.Count - 1);
             expressions.Add(new Expression(op, exp1, exp2));
+            return true;
         }
 
         public double EvaluateExpression(double var_value, Expression exp)
@@ -186,18 +210,35 @@ namespace GraphicCalculator
             if (exp.ExpType == ep.VAR)
                 return var_value;
 
-            double op1 = EvaluateExpression(var_value, exp.Op1);
-            double op2 = EvaluateExpression(var_value, exp.Op2);
-
-            switch (exp.OpType)
+            if (exp.ExpType == ep.EXP)
             {
-                case ot.POW: return Math.Pow(op1, op2); 
-                case ot.ADD: return op1 + op2;
-                case ot.MUL: return op1 * op2;
-                case ot.SUB: return op1 - op2; 
-                case ot.DIV: return op1 / op2;
-                default: return 0;
+                double op1 = EvaluateExpression(var_value, exp.Op1);
+                double op2 = EvaluateExpression(var_value, exp.Op2);
+
+                switch (exp.OpType)
+                {
+                    case ot.POW: return Math.Pow(op1, op2);
+                    case ot.ADD: return op1 + op2;
+                    case ot.MUL: return op1 * op2;
+                    case ot.SUB: return op1 - op2;
+                    case ot.DIV: return op1 / op2;
+                    default: return 0;
+                }
             }
+
+            if (exp.ExpType == ep.FUN)
+            {
+                double op = EvaluateExpression(var_value, exp.Op1);
+
+                switch (exp.OpType)
+                {
+                    case ot.SIN: return Math.Sin(op);
+                    case ot.COS: return Math.Cos(op);
+                    default: return 0;
+                }
+            }
+
+            return 0;
         }
 
         public double Evaluate(double var_value)
