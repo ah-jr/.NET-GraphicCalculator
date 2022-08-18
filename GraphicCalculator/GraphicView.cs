@@ -41,6 +41,12 @@ namespace GraphicCalculator
             SetStyle(ControlStyles.ResizeRedraw, true);
         }
 
+        public void SetVariableChar(char var)
+        {
+            math_manager.SetVariableChar(var);
+            Invalidate();
+        }
+
         public bool SetExpression(String exp)
         {
             paint_line = math_manager.ParseExpression(exp);

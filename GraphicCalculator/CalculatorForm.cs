@@ -43,9 +43,29 @@ namespace GraphicCalculator
             pnlButtons.Width = pnlGraphic.Width;
             pnlButtons.Height = c_PanelButtonsHeight;
 
-            txtExp.Left = (int) (c_TextExpOffset * pnlButtons.Width);
-            txtExp.Width = (int)(pnlButtons.Width - 2 * c_TextExpOffset * pnlButtons.Width);
-            lblExpFeedback.Left = txtExp.Left;
+            lblFun1.Left = (int) (c_TextExpOffset * pnlButtons.Width);
+            txtVar.Left = lblFun1.Right - 8;
+            lblFun2.Left = txtVar.Right - 8;
+            txtExp.Left = lblFun2.Right - 8;
+            txtExp.Width = (int)(pnlButtons.Width - 2 * c_TextExpOffset * pnlButtons.Width - lblFun1.Width - txtVar.Width - lblFun2.Width);
+            lblExpFeedback.Left = lblFun1.Left;
+
+            txtExp.BringToFront();
+            txtVar.BringToFront();
+        }
+
+        private void txtVar_TextChanged(object sender, EventArgs e)
+        {
+            if (txtVar.Text.Length == 1)
+            {
+                gvGraphic.SetVariableChar(char.Parse(txtVar.Text));
+                txtExp_TextChanged(null, null);
+            }
+        }
+
+        private void txtVar_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = !(char.IsLetter(e.KeyChar) || e.KeyChar == (char)Keys.Back);
         }
     }
 }

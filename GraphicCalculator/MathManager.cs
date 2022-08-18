@@ -99,6 +99,12 @@ namespace GraphicCalculator
     class MathManager
     {
         private Expression main_exp;
+        private char variable = 'x';
+
+        public void SetVariableChar(char var)
+        {
+            variable = var;
+        }
 
         public bool ParseExpression(String exp)
         {
@@ -129,7 +135,6 @@ namespace GraphicCalculator
                         case '(': operation = ot.PAR_L; break;
                         case ')': operation = ot.PAR_R; break;
 
-                        case 'x': expressions.Add(new Expression()); break;
                         case 's':
                             if (exp.Length > i + 2 && exp[i+1] == 'i' && exp[i+2] == 'n')
                                 expressions.Add(new Expression(ot.SIN, new Expression()));
@@ -145,6 +150,10 @@ namespace GraphicCalculator
                                 i--;
                                 expressions.Add(new Expression(float.Parse(number)));
                             }
+                            
+                            if (curr == variable)
+                                expressions.Add(new Expression());
+
                             break;
                     }
 
