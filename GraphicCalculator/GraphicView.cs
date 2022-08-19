@@ -27,6 +27,9 @@ namespace GraphicCalculator
         int y_offset = 0;
         int x_clicked = 0;
         int y_clicked = 0;
+        int x_last_mouse = 0;
+        int y_last_mouse = 0;
+
         MathManager math_manager;
 
         public GraphicView()
@@ -85,6 +88,11 @@ namespace GraphicCalculator
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
             using (Pen pen = new Pen(Color.Red, 3)) graphics.DrawLines(pen, graphic_points);
+        }
+
+        private void PaintSelection(Graphics graphics)
+        {
+            // Draw point in mouse's position
         }
 
         private void PaintGrid(Graphics graphics)
@@ -146,8 +154,13 @@ namespace GraphicCalculator
             PaintBack(e.Graphics);
             PaintGrid(e.Graphics);
 
-            if(paint_line)
+            if (paint_line)
+            {
                 PaintGraphics(e.Graphics);
+                PaintSelection(e.Graphics);
+            }
+
+
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)
@@ -186,6 +199,9 @@ namespace GraphicCalculator
             {
                 x_offset = e.X - x_clicked;
                 y_offset = e.Y - y_clicked;
+
+                x_last_mouse = e.X;
+                y_last_mouse = e.Y;
 
                 Invalidate();
             }
