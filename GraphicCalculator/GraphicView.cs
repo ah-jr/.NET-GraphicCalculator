@@ -66,15 +66,16 @@ namespace GraphicCalculator
         private void PaintGraphics(Graphics graphics)
         { 
             int offset = Width / 2;
-            PointF[] graphic_points = new PointF[2 * offset];
+            PointF point_a = new PointF(-1, -1);
+            PointF point_b = new PointF(-1, -1);
+
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            Pen pen = new Pen(Color.Red, 3);
+            pen.LineJoin = LineJoin.Bevel;
 
             for (int x = -offset - x_offset; x < offset - x_offset; x++)
             {
                 double y = math_manager.Evaluate(x / x_scale) * y_scale;
-
-                // In case some values are NaN:
-                if (Double.IsNaN(y))
-                    y = 0;
 
                 float x_screen = Width / 2 + (float)(x + x_offset);
                 float y_screen = Height / 2 - (float)(y - y_offset);
@@ -82,12 +83,19 @@ namespace GraphicCalculator
                 // Clip extremities: 
                 y_screen = Math.Min(Height + 2, Math.Max(y_screen, -2));
 
-                graphic_points[x + offset + x_offset] = new PointF(x_screen, y_screen);
+                // In case some values are NaN:
+                if (Double.IsNaN(y_screen))
+                  y_screen = -10;
+
+                point_b.X = x_screen;
+                point_b.Y = y_screen;
+
+                if (point_a.Y >= 0 && point_b.Y >= 0)
+                    graphics.DrawLine(pen, point_a, point_b);
+
+                point_a.X = point_b.X;
+                point_a.Y = point_b.Y;
             }
-
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
-            using (Pen pen = new Pen(Color.Red, 3)) graphics.DrawLines(pen, graphic_points);
         }
 
         private void PaintSelection(Graphics graphics)
@@ -99,8 +107,11 @@ namespace GraphicCalculator
             double y = math_manager.Evaluate(x / x_scale) * y_scale;
             float y_screen = Height / 2 - (float)(y - y_offset);
 
-            graphics.FillEllipse(brush, x_last_mouse - 3, y_screen - 3, 6, 6);
-            graphics.DrawEllipse(pen, x_last_mouse-3, y_screen-3, 6, 6);
+            if (!Double.IsNaN(y_screen))
+            {
+                graphics.FillEllipse(brush, x_last_mouse - 3, y_screen - 3, 6, 6);
+                graphics.DrawEllipse(pen, x_last_mouse - 3, y_screen - 3, 6, 6);
+            }
 
             Font drawFont = new Font("Arial Bold", 9, FontStyle.Bold);
             StringFormat drawFormat = new StringFormat();
@@ -175,8 +186,8 @@ namespace GraphicCalculator
             {
                 PaintGraphics(e.Graphics);
 
-/*                if ((Control.ModifierKeys & Keys.Shift) != 0)
-                    PaintSelection(e.Graphics);*/
+                if ((Control.ModifierKeys & Keys.Shift) != 0)
+                    PaintSelection(e.Graphics);
             }
         }
 
