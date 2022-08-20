@@ -30,6 +30,11 @@ namespace GraphicCalculator
             return ot2;
         }
 
+        public static bool IsFunction(int ot)
+        {
+            return (ot >= 100 && ot < 200);
+        }
+
         private static int GetPrecedence(int ot)
         {
             switch (ot)
@@ -136,8 +141,12 @@ namespace GraphicCalculator
                         case ')': operation = ot.PAR_R; break;
 
                         case 's':
-                            if (exp.Length > i + 2 && exp[i+1] == 'i' && exp[i+2] == 'n')
-                                expressions.Add(new Expression(ot.SIN, new Expression()));
+                            if (exp.Length > i + 2 && exp[i + 1] == 'i' && exp[i + 2] == 'n' && exp[i + 3] == '(')
+                            {
+                                operation = ot.SIN;
+                                i += 3;
+                            }
+
                             break;
 
                         default:
@@ -150,9 +159,11 @@ namespace GraphicCalculator
                                 i--;
                                 expressions.Add(new Expression(float.Parse(number)));
                             }
-                            
-                            if (curr == variable)
+                            else if (curr == variable)
+                            {
                                 expressions.Add(new Expression());
+                            }
+                            //else if () { }
 
                             break;
                     }
@@ -162,13 +173,18 @@ namespace GraphicCalculator
                         if (operation == ot.PAR_R)
                         {
                             operation = ot.UNDEF;
-                            while (operations.Count > 0 && operations.Peek() != ot.PAR_L)
+                            while (operations.Count > 0 && operations.Peek() != ot.PAR_L && !ot.IsFunction(operations.Peek()))
                                 MergeLastTwoExpressions(expressions, operations.Pop());
 
-                            if (operations.Count > 0 && operations.Peek() == ot.PAR_L)
-                                operations.Pop();
+                            if (operations.Count > 0)
+                            {
+                                if (operations.Peek() == ot.PAR_L)
+                                    operations.Pop();
+                                else if (ot.IsFunction(operations.Peek()))
+                                    MergeLastExpression(expressions, operations.Pop());
+                            }
                         }
-                        else if (operation != ot.PAR_L)
+                        else if (operation != ot.PAR_L && !ot.IsFunction(operation))
                         {
                             first = operations.Peek();
                             if (ot.HigherPrecedence(first, operation) == first)
@@ -186,7 +202,7 @@ namespace GraphicCalculator
                     if (!MergeLastTwoExpressions(expressions, operations.Pop()))
                         return false;
 
-                if (expressions.Count > 1)                    
+                if (expressions.Count != 1)                    
                     return false;
 
                  main_exp = expressions[0];
@@ -208,6 +224,17 @@ namespace GraphicCalculator
             expressions.RemoveAt(expressions.Count - 1);
             expressions.RemoveAt(expressions.Count - 1);
             expressions.Add(new Expression(op, exp1, exp2));
+            return true;
+        }
+
+        private bool MergeLastExpression(List<Expression> expressions, int op)
+        {
+            if (expressions.Count < 1)
+                return false;
+
+            Expression exp = expressions[expressions.Count - 1];
+            expressions.RemoveAt(expressions.Count - 1);
+            expressions.Add(new Expression(op, exp));
             return true;
         }
 
