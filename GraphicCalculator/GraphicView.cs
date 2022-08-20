@@ -92,7 +92,24 @@ namespace GraphicCalculator
 
         private void PaintSelection(Graphics graphics)
         {
-            // Draw point in mouse's position
+            SolidBrush brush = new SolidBrush(Color.White);
+            Pen pen = new Pen(Color.Red, 2) ;
+
+            double x = x_last_mouse - x_offset - Width / 2;
+            double y = math_manager.Evaluate(x / x_scale) * y_scale;
+            float y_screen = Height / 2 - (float)(y - y_offset);
+
+            graphics.FillEllipse(brush, x_last_mouse - 3, y_screen - 3, 6, 6);
+            graphics.DrawEllipse(pen, x_last_mouse-3, y_screen-3, 6, 6);
+
+            Font drawFont = new Font("Arial Bold", 9, FontStyle.Bold);
+            StringFormat drawFormat = new StringFormat();
+            brush.Color = Color.Black;
+
+            String point = "("  + (x / x_scale).ToString("0.000") + 
+                           ", " + (y / y_scale).ToString("0.000") + ")";
+
+            graphics.DrawString(point, drawFont, brush, x_last_mouse + 10, y_screen, drawFormat);
         }
 
         private void PaintGrid(Graphics graphics)
@@ -157,10 +174,10 @@ namespace GraphicCalculator
             if (paint_line)
             {
                 PaintGraphics(e.Graphics);
-                PaintSelection(e.Graphics);
+
+                if ((Control.ModifierKeys & Keys.Shift) != 0)
+                    PaintSelection(e.Graphics);
             }
-
-
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)
@@ -199,12 +216,11 @@ namespace GraphicCalculator
             {
                 x_offset = e.X - x_clicked;
                 y_offset = e.Y - y_clicked;
-
-                x_last_mouse = e.X;
-                y_last_mouse = e.Y;
-
-                Invalidate();
             }
+
+            x_last_mouse = e.X;
+            y_last_mouse = e.Y;
+            Invalidate();
         }
     }
 }
