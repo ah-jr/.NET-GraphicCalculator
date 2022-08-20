@@ -175,8 +175,8 @@ namespace GraphicCalculator
             {
                 PaintGraphics(e.Graphics);
 
-                if ((Control.ModifierKeys & Keys.Shift) != 0)
-                    PaintSelection(e.Graphics);
+/*                if ((Control.ModifierKeys & Keys.Shift) != 0)
+                    PaintSelection(e.Graphics);*/
             }
         }
 

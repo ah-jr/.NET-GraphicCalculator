@@ -16,6 +16,19 @@ namespace GraphicCalculator
 
         public const int SIN = 100;
         public const int COS = 101;
+        public const int TAN = 102;
+        public const int CSC = 103;
+        public const int SEC = 104;
+        public const int COT = 105;
+        public const int ASIN = 106;
+        public const int ACOS = 107;
+        public const int ATAN = 108;
+        public const int ACSC = 109;
+        public const int ASEC = 110;
+        public const int ACOT = 111;
+        public const int EXP = 112;
+        public const int LOG = 113;
+        public const int LN  = 114;
 
         public const int PAR_L = 200;
         public const int PAR_R = 201;
@@ -103,8 +116,30 @@ namespace GraphicCalculator
 
     class MathManager
     {
+        FunctionTrie functions;
         private Expression main_exp;
         private char variable = 'x';
+
+        public MathManager()
+        {
+            functions = new FunctionTrie();
+            functions.Insert("sin(", ot.SIN);
+            functions.Insert("cos(", ot.COS);
+            functions.Insert("tan(", ot.TAN);
+            functions.Insert("csc(", ot.CSC);
+            functions.Insert("sec(", ot.SEC);
+            functions.Insert("cot(", ot.COT);
+            functions.Insert("asin(", ot.ASIN);
+            functions.Insert("acos(", ot.ACOS);
+            functions.Insert("atan(", ot.ATAN);
+            functions.Insert("acsc(", ot.ACSC);
+            functions.Insert("asec(", ot.ASEC);
+            functions.Insert("acot(", ot.ACOT);
+
+            functions.Insert("exp(", ot.EXP);
+            functions.Insert("log(", ot.LOG);
+            functions.Insert("ln(", ot.LN);
+        }
 
         public void SetVariableChar(char var)
         {
@@ -120,6 +155,7 @@ namespace GraphicCalculator
             int i = 0;
             int first;
             int operation;
+            int length = 0;
             char curr;
 
             try
@@ -140,15 +176,6 @@ namespace GraphicCalculator
                         case '(': operation = ot.PAR_L; break;
                         case ')': operation = ot.PAR_R; break;
 
-                        case 's':
-                            if (exp.Length > i + 2 && exp[i + 1] == 'i' && exp[i + 2] == 'n' && exp[i + 3] == '(')
-                            {
-                                operation = ot.SIN;
-                                i += 3;
-                            }
-
-                            break;
-
                         default:
                             if (Char.IsDigit(curr))
                             {
@@ -159,11 +186,14 @@ namespace GraphicCalculator
                                 i--;
                                 expressions.Add(new Expression(float.Parse(number)));
                             }
+                            else if (functions.Search(exp.Substring(i), ref operation, ref length))
+                            {
+                                i += length - 1;
+                            }
                             else if (curr == variable)
                             {
                                 expressions.Add(new Expression());
                             }
-                            //else if () { }
 
                             break;
                     }
@@ -270,6 +300,19 @@ namespace GraphicCalculator
                 {
                     case ot.SIN: return Math.Sin(op);
                     case ot.COS: return Math.Cos(op);
+                    case ot.TAN: return Math.Tan(op);
+                    case ot.CSC: return 1/Math.Sin(op);
+                    case ot.SEC: return 1/Math.Cos(op);
+                    case ot.COT: return 1/Math.Tan(op);
+                    case ot.ASIN: return Math.Asin(op);
+                    case ot.ACOS: return Math.Acos(op);
+                    case ot.ATAN: return Math.Atan(op);
+                    case ot.ACSC: return Math.Asin(1/op);
+                    case ot.ASEC: return Math.Acos(1/op);
+                    case ot.ACOT: return Math.Atan(1/op);
+                    case ot.EXP: return Math.Exp(op);
+                    case ot.LOG: return Math.Log10(op);
+                    case ot.LN: return Math.Log(op);
                     default: return 0;
                 }
             }

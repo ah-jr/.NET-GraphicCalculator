@@ -52,6 +52,7 @@
     <Compile Include="CalculatorForm.Designer.cs">
       <DependentUpon>CalculatorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FunctionTrie.cs" />
     <Compile Include="MathManager.cs" />
     <Compile Include="GraphicView.cs" />
     <Compile Include="GraphicView.Designer.cs">
